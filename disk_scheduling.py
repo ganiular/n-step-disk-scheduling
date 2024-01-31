@@ -1,14 +1,14 @@
 class Request:
     def __init__(self, number) -> None:
         self.track_number = number
-
-    def __repr__(self) -> str:
-        return str(self.track_number)
+        self.seek_time = 0
 
 
 class NStepScanDiskSheduling:
-    def __init__(self, n, requests: list[Request], volume=100) -> None:
+    def __init__(self, n, requests: list[Request], volume) -> None:
         self.volume = volume  # disk volume, 100 by default
+        self.rotational_latency = 5  # milliseconds per track
+        self.total_seek_time = 0
 
         # Raise error if any track number is greater than the disk volume
         for request in requests:
@@ -19,10 +19,11 @@ class NStepScanDiskSheduling:
 
         self.n = n
         self.main_queue = requests
+        self.request_count = len(requests)
+        self.served_requests = []
 
     def start(self, from_pos):
         current_pos = from_pos
-        total_seek_time = 0
         sub_queue: list[Request] = []
         direction = None
         while len(self.main_queue) > 0 or len(sub_queue) > 0:
@@ -53,12 +54,24 @@ class NStepScanDiskSheduling:
                     direction = "right"
 
             self.serve_request(request, seek_time)
-            total_seek_time += seek_time
-
-        print("Total seek time:", total_seek_time)
 
     def serve_request(self, request: Request, seek_time):
-        print(request.track_number, seek_time, sep="\t")
+        request.seek_time = seek_time
+        self.total_seek_time += seek_time
+        self.served_requests.append(request)
+
+    def print_result(self):
+        print("-" * 35)
+        print("Track number \t| Seek time")
+        print("-" * 35)
+        for request in self.served_requests:
+            print(request.track_number, "\t\t|", request.seek_time)
+        print("Total seek time:", self.total_seek_time)
+        tranfer_time = self.total_seek_time + self.rotational_latency
+        print("Transfer time:", tranfer_time)
+        access_time = self.total_seek_time + self.rotational_latency + tranfer_time
+        print("Disk access time:", access_time)
+        print("Throughput:", self.request_count / access_time)
 
     def sorter(self, requests: list[Request], current_pos):
         sort = lambda requests, reverse: sorted(
@@ -97,8 +110,11 @@ class NStepScanDiskSheduling:
 
 
 if __name__ == "__main__":
-    N = 6
+    volume = int(input("Enter disk size: "))
+    N = int(input("Enter N value: "))
     requests = [Request(x) for x in (70, 60, 80, 40, 10, 15)]
-    ds = NStepScanDiskSheduling(N, requests)
+
+    ds = NStepScanDiskSheduling(N, requests, volume)
     ds.start(20)
+    ds.print_result()
     # print(ds.sorter(requests, 68))
