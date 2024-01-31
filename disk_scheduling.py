@@ -1,3 +1,6 @@
+import random
+
+
 class Request:
     def __init__(self, number) -> None:
         self.track_number = number
@@ -67,11 +70,13 @@ class NStepScanDiskSheduling:
         for request in self.served_requests:
             print(request.track_number, "\t\t|", request.seek_time)
         print("Total seek time:", self.total_seek_time)
-        tranfer_time = self.total_seek_time + self.rotational_latency
-        print("Transfer time:", tranfer_time)
-        access_time = self.total_seek_time + self.rotational_latency + tranfer_time
-        print("Disk access time:", access_time)
-        print("Throughput:", self.request_count / access_time)
+        # tranfer_time = self.total_seek_time + self.rotational_latency
+        # print("Transfer time:", tranfer_time)
+        # access_time = self.total_seek_time + self.rotational_latency + tranfer_time
+        # print("Disk access time:", access_time)
+        # print("Throughput:", self.request_count / access_time)
+        throughput = self.request_count / self.total_seek_time
+        print("Throughput:", throughput)
 
     def sorter(self, requests: list[Request], current_pos):
         sort = lambda requests, reverse: sorted(
@@ -112,9 +117,10 @@ class NStepScanDiskSheduling:
 if __name__ == "__main__":
     volume = int(input("Enter disk size: "))
     N = int(input("Enter N value: "))
-    requests = [Request(x) for x in (70, 60, 80, 40, 10, 15)]
+    no_request = int(input("Number of requests: "))
+
+    requests = [Request(random.randint(0, volume)) for i in range(no_request)]
 
     ds = NStepScanDiskSheduling(N, requests, volume)
     ds.start(20)
     ds.print_result()
-    # print(ds.sorter(requests, 68))
