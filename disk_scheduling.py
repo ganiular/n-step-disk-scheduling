@@ -117,10 +117,17 @@ class NStepScanDiskSheduling:
 if __name__ == "__main__":
     volume = int(input("Enter disk size: "))
     N = int(input("Enter N value: "))
-    no_request = int(input("Number of requests: "))
+    requests = list(eval(input("Requests: ")))
 
-    requests = [Request(random.randint(0, volume)) for i in range(no_request)]
+    # Convert each item to Request type, and raise error if any number is greater than disk size
+    for i in range(len(requests)):
+        x = requests[i]
+        if x > volume:
+            raise ValueError(f"Invalid track number: {x} is more than disk volume")
+        requests[i] = Request(x)
 
-    ds = NStepScanDiskSheduling(N, requests, volume)
-    ds.start(20)
-    ds.print_result()
+    for i in range(1, N + 1):
+        print("\nFor N =", i)
+        ds = NStepScanDiskSheduling(i, requests.copy(), volume)
+        ds.start(20)
+        ds.print_result()
