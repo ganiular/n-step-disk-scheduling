@@ -118,6 +118,7 @@ if __name__ == "__main__":
     volume = int(input("Enter disk size: "))
     N = int(input("Enter N value: "))
     requests = list(eval(input("Requests: ")))
+    head_pos = int(input("Enter head position: "))
 
     # Convert each item to Request type, and raise error if any number is greater than disk size
     for i in range(len(requests)):
@@ -129,5 +130,5 @@ if __name__ == "__main__":
     for i in range(1, N + 1):
         print("\nFor N =", i)
         ds = NStepScanDiskSheduling(i, requests.copy(), volume)
-        ds.start(20)
+        ds.start(head_pos)
         ds.print_result()
