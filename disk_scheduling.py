@@ -1,4 +1,4 @@
-import random
+from prettytable import PrettyTable
 
 
 class Request:
@@ -7,11 +7,57 @@ class Request:
         self.seek_time = 0
 
 
+class Result:
+    results: list['Result'] = []
+
+    def __init__(self, n, total_seek_time, head_mount, average_seek_time, transfer_time, disk_access_time) -> None:
+        self.n = n
+        self.total_seek_time = total_seek_time
+        self.head_mount = head_mount
+        self.average_seek_time = average_seek_time
+        self.transfer_time = transfer_time
+        self.disk_access_time = disk_access_time
+        self.results.append(self)
+
+    def table():
+        table_head = []
+        table_data = []
+        for result in Result.results:
+            table_head.append(f"N = {result.n}")
+        for result in Result.results:
+            table_data.append([
+                result.total_seek_time, 
+                result.head_mount, 
+                result.average_seek_time, 
+                result.transfer_time, 
+                result.disk_access_time
+            ])
+            
+        result_table = PrettyTable()
+        result_table.field_names = ['Result'] + table_head
+        result_table.add_row(["Seek time"] + [col[0] for col in table_data])
+        result_table.add_row(["Head Move"] + [col[1] for col in table_data])
+        result_table.add_row(["Avearge Seek time"] + [col[2] for col in table_data])
+        result_table.add_row(["Transfer time"] + [col[3] for col in table_data])
+        result_table.add_row(["Disk access time"] + [col[4] for col in table_data])
+
+        # for i, row_data in enumerate(table_data, start=1):
+        #     result_table.add_row([f"Row {i}"] + row_data)
+        #     pass
+
+        # Print the table
+        print(result_table)
+            
+
 class NStepScanDiskSheduling:
-    def __init__(self, n, requests: list[Request], volume) -> None:
+    def __init__(self, n, requests: list[Request], volume, no_of_bytes_to_be_tranfer, no_of_bytes_on_track, rotational_speed) -> None:
         self.volume = volume  # disk volume, 100 by default
         self.rotational_latency = 5  # milliseconds per track
+        self.no_of_bytes_to_be_tranfer = no_of_bytes_to_be_tranfer
+        self.no_of_bytes_on_track = no_of_bytes_on_track
+        self.rotational_speed = rotational_speed
         self.total_seek_time = 0
+        self.head_mount = 0
 
         # Raise error if any track number is greater than the disk volume
         for request in requests:
@@ -42,18 +88,22 @@ class NStepScanDiskSheduling:
                 if request.track_number >= current_pos:
                     seek_time = request.track_number - current_pos
                     current_pos = request.track_number
+                    self.head_mount += 1
                 else:
                     seek_time = self.volume - current_pos
                     seek_time += self.volume - request.track_number
                     current_pos = request.track_number
+                    self.head_mount += 2
                     direction = "left"
             elif direction == "left":
                 if request.track_number <= current_pos:
                     seek_time = current_pos - request.track_number
                     current_pos = request.track_number
+                    self.head_mount += 1
                 else:
                     seek_time = current_pos + request.track_number
                     current_pos = request.track_number
+                    self.head_mount += 2
                     direction = "right"
 
             self.serve_request(request, seek_time)
@@ -77,6 +127,19 @@ class NStepScanDiskSheduling:
         # print("Throughput:", self.request_count / access_time)
         throughput = self.request_count / self.total_seek_time
         print("Throughput:", throughput)
+
+        average_seek_time = self.total_seek_time / self.request_count
+        print("Average seek time:", average_seek_time)
+
+        transfer_time = average_seek_time + (1/2) * (self.rotational_speed) + (self.no_of_bytes_to_be_tranfer / (self.no_of_bytes_on_track * self.rotational_speed))
+        print("Transfer time:", transfer_time)
+
+        disk_access_time = self.total_seek_time + self.rotational_latency + transfer_time
+        print("Disk Access time:", disk_access_time)
+
+        Result(self.n, self.total_seek_time, self.head_mount, average_seek_time, transfer_time, disk_access_time)
+
+
 
     def sorter(self, requests: list[Request], current_pos):
         sort = lambda requests, reverse: sorted(
@@ -119,6 +182,9 @@ if __name__ == "__main__":
     N = int(input("Enter N value: "))
     requests = list(eval(input("Requests: ")))
     head_pos = int(input("Enter head position: "))
+    no_of_bytes_to_be_tranfer = float(input("Enter number of bytes to be trasfer: "))
+    no_of_bytes_on_track = float(input("Enter number of byte on track: "))
+    rotational_speed = float(input("Enter rotational speed: "))
 
     # Convert each item to Request type, and raise error if any number is greater than disk size
     for i in range(len(requests)):
@@ -129,6 +195,8 @@ if __name__ == "__main__":
 
     for i in range(1, N + 1):
         print("\nFor N =", i)
-        ds = NStepScanDiskSheduling(i, requests.copy(), volume)
+        ds = NStepScanDiskSheduling(i, requests.copy(), volume, no_of_bytes_to_be_tranfer, no_of_bytes_on_track, rotational_speed)
         ds.start(head_pos)
         ds.print_result()
+
+    Result.table()
