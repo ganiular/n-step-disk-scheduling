@@ -186,6 +186,7 @@ if __name__ == "__main__":
     no_of_bytes_on_track = float(input("Enter number of byte on track: "))
     rotational_speed = float(input("Enter rotational speed: "))
 
+    # Generate more random requests and add it to the list of requests
     more_requests = [random.randint(0, volume) for i in range(more_request_count)]
     requests += more_requests
 
