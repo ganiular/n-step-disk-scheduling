@@ -1,5 +1,5 @@
 from prettytable import PrettyTable
-
+import random
 
 class Request:
     def __init__(self, number) -> None:
@@ -140,7 +140,6 @@ class NStepScanDiskSheduling:
         Result(self.n, self.total_seek_time, self.head_mount, average_seek_time, transfer_time, disk_access_time)
 
 
-
     def sorter(self, requests: list[Request], current_pos):
         sort = lambda requests, reverse: sorted(
             requests, key=lambda x: x.track_number, reverse=reverse
@@ -181,10 +180,14 @@ if __name__ == "__main__":
     volume = int(input("Enter disk size: "))
     N = int(input("Enter N value: "))
     requests = list(eval(input("Requests: ")))
+    more_request_count = int(input("Enter more requests count: "))
     head_pos = int(input("Enter head position: "))
     no_of_bytes_to_be_tranfer = float(input("Enter number of bytes to be trasfer: "))
     no_of_bytes_on_track = float(input("Enter number of byte on track: "))
     rotational_speed = float(input("Enter rotational speed: "))
+
+    more_requests = [random.randint(0, volume) for i in range(more_request_count)]
+    requests += more_requests
 
     # Convert each item to Request type, and raise error if any number is greater than disk size
     for i in range(len(requests)):
