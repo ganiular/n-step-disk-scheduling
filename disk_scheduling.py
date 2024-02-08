@@ -197,6 +197,9 @@ if __name__ == "__main__":
             raise ValueError(f"Invalid track number: {x} is more than disk volume")
         requests[i] = Request(x)
 
+    # Print request list
+    print("Requests: " + requests)
+
     for i in range(1, N + 1):
         print("\nFor N =", i)
         ds = NStepScanDiskSheduling(i, requests.copy(), volume, no_of_bytes_to_be_tranfer, no_of_bytes_on_track, rotational_speed)
