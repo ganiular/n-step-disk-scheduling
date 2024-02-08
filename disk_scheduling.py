@@ -1,4 +1,4 @@
-from prettytable import PrettyTable
+# from prettytable import PrettyTable
 import random
 
 class Request:
@@ -179,7 +179,8 @@ class NStepScanDiskSheduling:
 if __name__ == "__main__":
     volume = int(input("Enter disk size: "))
     N = int(input("Enter N value: "))
-    requests = list(eval(input("Requests: ")))
+    requests = input("Requests: ").split(',')
+    requests = [int(r) for r in requests]
     more_request_count = int(input("Enter more requests count: "))
     head_pos = int(input("Enter head position: "))
     no_of_bytes_to_be_tranfer = float(input("Enter number of bytes to be trasfer: "))
@@ -206,4 +207,4 @@ if __name__ == "__main__":
         ds.start(head_pos)
         ds.print_result()
 
-    Result.table()
+    # Result.table()
