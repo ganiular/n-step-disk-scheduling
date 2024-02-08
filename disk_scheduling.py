@@ -1,4 +1,4 @@
-# from prettytable import PrettyTable
+from prettytable import PrettyTable
 import random
 
 class Request:
@@ -207,4 +207,4 @@ if __name__ == "__main__":
         ds.start(head_pos)
         ds.print_result()
 
-    # Result.table()
+    Result.table()
