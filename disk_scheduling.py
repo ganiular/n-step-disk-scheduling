@@ -190,15 +190,15 @@ if __name__ == "__main__":
     more_requests = [random.randint(0, volume) for i in range(more_request_count)]
     requests += more_requests
 
+    # Print request list
+    print("Requests:", requests)
+
     # Convert each item to Request type, and raise error if any number is greater than disk size
     for i in range(len(requests)):
         x = requests[i]
         if x > volume:
             raise ValueError(f"Invalid track number: {x} is more than disk volume")
         requests[i] = Request(x)
-
-    # Print request list
-    print("Requests: " + requests)
 
     for i in range(1, N + 1):
         print("\nFor N =", i)
