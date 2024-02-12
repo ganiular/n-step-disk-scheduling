@@ -49,7 +49,7 @@ class Result:
         print(result_table)
 
 class NStepScanDiskSheduling:
-    def __init__(self, n, requests: list[Request], volume, no_of_bytes_to_be_tranfer, no_of_bytes_on_track, rotational_speed) -> None:
+    def __init__(self, n, requests: list[Request], volume, seek_rate, no_of_bytes_to_be_tranfer, no_of_bytes_on_track, rotational_speed) -> None:
         self.volume = volume  # disk volume, 100 by default
         self.rotational_latency = 5  # milliseconds per track
         self.no_of_bytes_to_be_tranfer = no_of_bytes_to_be_tranfer
@@ -57,7 +57,7 @@ class NStepScanDiskSheduling:
         self.rotational_speed = rotational_speed
         self.total_head_movement = 0
         self.head_mount = 0
-        self.seek_rate = 1
+        self.seek_rate = seek_rate
 
         # Raise error if any track number is greater than the disk volume
         for request in requests:
@@ -180,6 +180,7 @@ if __name__ == "__main__":
     requests = [int(r) for r in requests]
     more_request_count = int(input("Enter more requests count: "))
     head_pos = int(input("Enter head position: "))
+    seek_rate = float(input('Enter seek rate: '))
     no_of_bytes_to_be_tranfer = float(input("Enter number of bytes to be trasfer: "))
     no_of_bytes_on_track = float(input("Enter number of byte on track: "))
     rotational_speed = float(input("Enter rotational speed: "))
@@ -200,7 +201,7 @@ if __name__ == "__main__":
 
     for i in range(1, N + 1):
         print("\nFor N =", i)
-        ds = NStepScanDiskSheduling(i, requests.copy(), volume, no_of_bytes_to_be_tranfer, no_of_bytes_on_track, rotational_speed)
+        ds = NStepScanDiskSheduling(i, requests.copy(), volume, seek_rate, no_of_bytes_to_be_tranfer, no_of_bytes_on_track, rotational_speed)
         ds.start(head_pos)
         ds.print_result()
 
